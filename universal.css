@@ -182,3 +182,7 @@ h1 {
     cursor: pointer;
     letter-spacing: 2px;
 }
+
+.link:visited, .link:link {
+    color: white;
+}

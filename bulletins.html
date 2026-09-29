@@ -18,13 +18,13 @@
         <!-- Website navigation -->
         <nav class="site-nav">
             <div class="nav-left">
-                <img src="./assets/adlogo.png" alt="Logo" />
+                <img src="/assets/adlogo.png" alt="Logo" />
                 <span class="site-title">ApatheticDELL</span>
             </div>
             <div class="nav-right">
                 <a href="/">Home</a>
-                <a class="site-title" href="./bulletins">Bulletins</a>
-                <a href="./about">About</a>
+                <a class="site-title" href="/bulletins">Bulletins</a>
+                <a href="/about">About</a>
             </div>
         </nav>
 
@@ -32,14 +32,13 @@
                 <h1>Bullitens</h1>
         </div>
 
-        <div class="section-b">
+        <!--<div class="section-b">
             <p>No active bullitens</p>
-        </div>
+        </div>-->
 
         <!-- BULLETINS START -->
-
+        <div id="starter"></div>
         
-
         <!-- BULLETINS END -->
 
         <!-- TEMPLATE:
@@ -48,7 +47,78 @@
             <p>Test description.</p>
         </div>
         -->
+        <script>
+            async function getBullitens() {
+                const url = "https://zuni.apatheticdell.net/api/collections/apd_bulletins/records";
+                
+                try {
+                    
+                    const response = await fetch(url);
+                    
+                    if (!response.ok) { throw new Error(`Response status: ${response.status}`); }
 
+                    const bulletins_json = await response.json();
+                    
+                    console.log(bulletins_json);
+
+                    return(bulletins_json);
+
+                } catch (error) { console.error(error.message); return null; }
+            }
+
+            function addElement(content) {
+                const sectionBulletin = document.createElement("div");
+                const headlineElement = document.createElement("h2");
+                var descriptionElement = document.createElement("div");
+
+                const headline = document.createTextNode(content.headline);
+
+                // const description = document.createTextNode(content.description);
+                // descriptionElement.appendChild(description);
+                
+                headlineElement.appendChild(headline);
+                descriptionElement.innerHTML = content.description;
+
+                const level = content.level;
+                if (level == "warning") {
+                    sectionBulletin.className = "section-c";
+                } else {
+                    sectionBulletin.className = "section-b";
+                }
+                
+                sectionBulletin.appendChild(headlineElement);
+                sectionBulletin.appendChild(descriptionElement);
+
+                const starterElement = document.getElementById("starter");
+
+                document.body.insertBefore(sectionBulletin, starterElement)
+            }
+
+            function setNoActive() {
+                const noBulletinsElement = document.createElement("div");
+                noBulletinsElement.className = "section-b";
+                noBulletinsElement.innerHTML = "<p>No active bulletins.";
+                const starterElement = document.getElementById("starter");
+                document.body.insertBefore(noBulletinsElement, starterElement)
+            }
+
+            async function processBullitens() {
+                const bulletins_json = await getBullitens();
+
+                if (bulletins_json == null) {
+                    setNoActive()
+                } else {
+                    var bulletins_list = bulletins_json.items
+
+                    if (bulletins_list.length == 0) { setNoActive(); }
+
+                    for(var i = 0, size = bulletins_list.length; i < size ; i++){
+                    var item = bulletins_list[i]; addElement(item); }
+                }                
+            }
+            
+            processBullitens();
+        </script>
         <footer>
             <p>Copyright &#169; ApatheticDELL</p>
             <p>Website created by ApatheticDELL and <a href="https://bunnytub.com/">BunnyTub</a></p>
